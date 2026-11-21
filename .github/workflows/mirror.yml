@@ -609,6 +609,10 @@ jobs:
             python3 -m pip install --user awscli
             echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           fi
+          # R2 occasionally loses an individual multipart upload part during
+          # CompleteMultipartUpload. All mirrored installers are below S3's
+          # 5 GiB single-PUT limit, so avoid the multipart finalization path.
+          aws configure set default.s3.multipart_threshold 5GB
 
       - name: Sync GitHub Release assets to Cloudflare R2
         if: steps.meta.outputs.sync_latest == 'true'
